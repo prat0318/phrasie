@@ -8,7 +8,7 @@ module Phrasie
 
     def initialize(filter={})
       self.tagger = Tagger.new
-      self.default_filter = {:strength => 2, :occur => 3}.merge(filter)
+      self.default_filter = {:strength => 1, :occur => 1}.merge(filter)
     end
     
     def to_s
@@ -65,14 +65,14 @@ module Phrasie
       return terms \
               .map{|phrase, occurance| [phrase, occurance, phrase.split.size] } \
               .delete_if{|phrase, occurance, strength| !self.validate(phrase, occurance, strength, filter)} \
-              .sort_by{|phrase, occurance, strength|  occurance + ((occurance/5.0)*strength) }.reverse
+              .sort_by{|phrase, occurance, strength| [occurance, phrase.size]}.reverse
     end
 
     protected
     
     # Validates the phrase is within the bounds of our filter
     def validate(word, occur, strength, filter)
-      occur >= filter[:occur] || (occur >= 2 && strength >= filter[:strength])
+      occur >= filter[:occur] && strength == filter[:strength]
     end
     
     # Used within #phrases
